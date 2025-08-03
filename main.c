@@ -12,6 +12,8 @@ void parse_str_into_list(int listofones[], char listasstr[], int *size);
 void parse_bool_into_list(int listofones[], char bool_func[]);
 void printlist(int list[], int length);
 void print_bool_matrix(int rows, int columns,bool matrix[rows][columns]);
+void swap_rows(int rows, int columns, bool matrix[rows][columns], int row1, int row2);
+void swap_columns(int rows, int columns, bool matrix[rows][columns], int col1, int col2);
 
 int main()
 {
@@ -58,8 +60,7 @@ int main()
 
     else
     {
-        printf("Enter the list of Ones seperated by commas\n");
-        printf("i.e. 0,1,3 :\n");
+        printf("Enter the list of Ones seperated by commas i.e. 0,1,3 :\n");
         scanf("%s", &listasstr);
         
         parse_str_into_list(listofones, listasstr, &list_size);
@@ -75,6 +76,13 @@ int main()
         int i = index / columns;  // row
         int j = index % columns;  // column
         k_map[i][j] = 1;
+    }
+
+    if (rows > 2) {
+        swap_rows(rows, columns, k_map, rows - 2, rows - 1);
+    }
+    if (columns > 2) {
+        swap_columns(rows, columns, k_map, columns - 2, columns - 1);
     }
 
     print_bool_matrix(rows, columns, k_map);
@@ -214,5 +222,21 @@ void print_bool_matrix(int rows, int columns,bool matrix[rows][columns])
             if (j < columns - 1) printf(" ");
         }
         printf("]\n");
+    }
+}
+
+void swap_rows(int rows, int columns, bool matrix[rows][columns], int row1, int row2) {
+    for (int col = 0; col < columns; col++) {
+        bool temp = matrix[row1][col];
+        matrix[row1][col] = matrix[row2][col];
+        matrix[row2][col] = temp;
+    }
+}
+
+void swap_columns(int rows, int columns, bool matrix[rows][columns], int col1, int col2) {
+    for (int row = 0; row < rows; row++) {
+        bool temp = matrix[row][col1];
+        matrix[row][col1] = matrix[row][col2];
+        matrix[row][col2] = temp;
     }
 }
