@@ -8,12 +8,33 @@
 
 #define MAX 50
 
+// creating a type tuple
+typedef struct
+{
+    int i;
+    int j;
+}Tuple;
+
+// to store groups like {(0,1),(0,2)} for grouping, we'll have to make tuplePairs
+typedef struct {
+    Tuple a;
+    Tuple b;
+} TuplePair;
+
+// Temp len function to print the grouplist
+int len = 0;
+
+
+// Headers to all the functions
 void parse_str_into_list(int listofones[], char listasstr[], int *size);
 void parse_bool_into_list(int listofones[], char bool_func[]);
 void printlist(int list[], int length);
 void print_bool_matrix(int rows, int columns,bool matrix[rows][columns]);
 void swap_rows(int rows, int columns, bool matrix[rows][columns], int row1, int row2);
 void swap_columns(int rows, int columns, bool matrix[rows][columns], int col1, int col2);
+void grouping(int rows, int columns,bool matrix[rows][columns], TuplePair grouplist[], int k);
+void print_grouplist(TuplePair grouplist[],int length);
+TuplePair get_tuple_pair(Tuple index1, Tuple index2);
 
 int main()
 {
@@ -67,7 +88,7 @@ int main()
     }
 
     // making a boolean matrix because it takes less space and 1 == true and 0 == false
-    bool k_map [rows][columns];
+    bool k_map [rows][columns]; 
     memset(k_map, 0, sizeof(k_map));
 
     // finding out where in the matrix I should put ones and where not
@@ -85,72 +106,17 @@ int main()
         swap_columns(rows, columns, k_map, columns - 2, columns - 1);
     }
 
+    TuplePair grouplist[boxes];
+
+    grouping(rows, columns, k_map, grouplist, 1);
+
     print_bool_matrix(rows, columns, k_map);
 
+    print_grouplist(grouplist, len);
+
+    printf("%d", len);
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -225,6 +191,7 @@ void print_bool_matrix(int rows, int columns,bool matrix[rows][columns])
     }
 }
 
+// basic functions to swap rows and columns for times in need
 void swap_rows(int rows, int columns, bool matrix[rows][columns], int row1, int row2) {
     for (int col = 0; col < columns; col++) {
         bool temp = matrix[row1][col];
@@ -232,11 +199,66 @@ void swap_rows(int rows, int columns, bool matrix[rows][columns], int row1, int 
         matrix[row2][col] = temp;
     }
 }
-
 void swap_columns(int rows, int columns, bool matrix[rows][columns], int col1, int col2) {
     for (int row = 0; row < rows; row++) {
         bool temp = matrix[row][col1];
         matrix[row][col1] = matrix[row][col2];
         matrix[row][col2] = temp;
     }
+}
+
+
+// Function of grouping into 2's groups
+void grouping(int rows, int columns,bool matrix[rows][columns], TuplePair grouplist[], int k)
+{
+    // Make groups of 2's and recursively go until i get to rows*columns or 2^n th grouping
+
+    // Here k is the grouping index
+    if (k > rows*columns)
+    {
+        return;
+    }
+
+    int count = 0;
+
+    for(int i = 0; i < rows; i++)
+    {
+        for(int j = 0; j < columns; j++)
+        {
+            if(matrix[i][j] == 1)
+            {
+                if (j+1 < columns && matrix[i][j+1] == 1)
+                {
+                    grouplist[count] = get_tuple_pair((Tuple){i,j}, (Tuple){i, j+1});
+                    count++;
+                }
+                if (i+1 < rows && matrix[i+1][j] == 1)
+                {
+                    grouplist[count] = get_tuple_pair((Tuple){i,j}, (Tuple){i+1, j});
+                    count++;
+                }
+            }
+        }
+    }
+    
+
+    len = count;
+
+    grouping(rows, columns, matrix, grouplist, k*2);
+}
+
+void print_grouplist(TuplePair grouplist[], int length)
+{
+    printf("Group List:\n");
+    for (int i = 0; i < length; i++) {
+        printf("((%d, %d), (%d, %d))\n",
+               grouplist[i].a.i, grouplist[i].a.j,
+               grouplist[i].b.i, grouplist[i].b.j);
+    }
+}
+
+
+TuplePair get_tuple_pair(Tuple index1, Tuple index2) {
+    // I am so proud of myself lol
+    return (TuplePair){index1, index2};
 }
